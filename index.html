@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matt Skills 速查 · 常用命令与作用</title>
+    <meta
+      name="description"
+      content="Matt Skills（dsh-mattpocock-skills）25 个技能的常用命令与作用速查：主流程、入口、代码库健康、词汇层与独立技能。"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">/</span>
+          <span class="brand-text">
+            <strong>Matt Skills 速查</strong>
+            <small>常用命令与作用</small>
+          </span>
+        </a>
+
+        <nav class="site-nav" aria-label="页面导航">
+          <a href="#flow">主流程</a>
+          <a href="#commands">命令速查</a>
+          <a href="#extras">入口与边界</a>
+          <a href="#start">开始使用</a>
+        </nav>
+
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-pressed="false"
+          title="切换深色 / 浅色"
+        >
+          <span aria-hidden="true" id="theme-icon">◐</span>
+          <span class="sr-only">切换深色 / 浅色主题</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" id="top">
+        <p class="eyebrow">dsh-mattpocock-skills</p>
+        <h1>25 个技能，说清<em>该用哪个</em>、<em>怎么用</em>。</h1>
+        <p class="lede">
+          Matt Pocock 的工程技能集，面向 DeepSeek Harness 的适配版。它们不是 25 个孤立的命令，
+          而是一条<strong>主流程</strong>（想法 → 打磨 → 拆分 → 实现）加两个<strong>入口</strong>，
+          底下再垫一层<strong>共用的词汇</strong>。这一页就是 <code>/ask-matt</code> 的文字版。
+        </p>
+
+        <dl class="hero-stats">
+          <div>
+            <dt>技能总数</dt>
+            <dd id="stat-total">25</dd>
+          </div>
+          <div>
+            <dt>你调用（<code>/名称</code>）</dt>
+            <dd id="stat-user">14</dd>
+          </div>
+          <div>
+            <dt>模型可自行取用</dt>
+            <dd id="stat-model">11</dd>
+          </div>
+          <div class="stat-wide">
+            <dt>每个仓库先跑一次</dt>
+            <dd><code>/setup-matt-pocock-skills</code> <span class="arrow" aria-hidden="true">→</span> <code>/ask-matt</code></dd>
+          </div>
+        </dl>
+
+        <p class="hero-cta">
+          <a class="btn btn-primary" href="#commands">看命令速查</a>
+          <a class="btn" href="#flow">看主流程</a>
+        </p>
+      </section>
+
+      <section class="section wrap" id="flow" aria-labelledby="flow-title">
+        <header class="section-head">
+          <h2 id="flow-title">主流程：想法 → 交付</h2>
+          <p>大多数工作走这条路。步骤 1–3 请留在<strong>同一个上下文窗口</strong>里，别压缩、别清空，直到 <code>/to-tickets</code> 跑完。</p>
+        </header>
+
+        <ol class="flow" id="flow-list"></ol>
+
+        <aside class="callout">
+          <h3>两个分叉，一句话记住</h3>
+          <ul>
+            <li><strong>要跑起来才知道？</strong> 用 <code>/handoff</code> 绕到 <code>/prototype</code>，再把结论 handoff 回来。</li>
+            <li><strong>装不进一个会话？</strong> <code>/to-spec</code> → <code>/to-tickets</code>，然后每张工单开一个新会话跑 <code>/implement</code>。</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="section wrap" id="commands" aria-labelledby="commands-title">
+        <header class="section-head">
+          <h2 id="commands-title">命令速查</h2>
+          <p>
+            每个技能一条：打 <code>/名称</code> 就能用。<strong>你调用</strong>的技能必须由你输入命令触发；
+            <strong>模型调用</strong>的技能 agent 会自己取用，你也可以直接点名。按 <kbd>/</kbd> 聚焦搜索。
+          </p>
+        </header>
+
+        <div class="controls">
+          <div class="search">
+            <label class="sr-only" for="search">搜索技能</label>
+            <input
+              id="search"
+              type="search"
+              placeholder="搜索技能名或作用，例如 tdd、工单、冲突…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="clear-btn" id="clear-search" type="button" hidden>清空</button>
+          </div>
+          <div class="chips" id="chips" role="group" aria-label="按分类筛选"></div>
+        </div>
+
+        <p class="result-line" id="result-line" role="status" aria-live="polite"></p>
+
+        <div class="grid" id="skill-grid"></div>
+
+        <p class="empty" id="empty-state" hidden>
+          没有匹配的技能。换个关键词，或点「全部」看完整清单。
+        </p>
+
+        <noscript>
+          <div class="callout callout-warn">
+            <h3>脚本被禁用</h3>
+            <p>卡片清单需要 JavaScript 渲染。核心命令不受影响：<code>/setup-matt-pocock-skills</code> →
+              <code>/ask-matt</code> → <code>/grill-with-docs</code> → <code>/to-spec</code> →
+              <code>/to-tickets</code> → <code>/implement</code> → <code>/code-review</code>。
+              完整清单见 <code>data/skills.js</code>。</p>
+          </div>
+        </noscript>
+      </section>
+
+      <section class="section wrap" id="extras" aria-labelledby="extras-title">
+        <header class="section-head">
+          <h2 id="extras-title">入口、健康与阶段边界</h2>
+          <p>主线之外的三处补充：活从哪儿冒出来、代码库怎么保养、一个阶段结束时的五种选择。</p>
+        </header>
+
+        <div class="panels">
+          <article class="panel">
+            <h3>两个入口</h3>
+            <ul class="link-list">
+              <li>
+                <code data-cmd="/triage">/triage</code>
+                <span>bug 报告与功能请求堆积时。只处理不是你创建的原始输入。</span>
+              </li>
+              <li>
+                <code data-cmd="/diagnosing-bugs">/diagnosing-bugs</code>
+                <span>坏了、而且一眼看不出原因。先有一条变红的命令，再谈理论。</span>
+              </li>
+              <li>
+                <code data-cmd="/wayfinder">/wayfinder</code>
+                <span>大到装不进一个会话、路线还看不清的工程。产出决策，路清后回 /to-spec。</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3>代码库健康</h3>
+            <ul class="link-list">
+              <li>
+                <code data-cmd="/improve-codebase-architecture">/improve-codebase-architecture</code>
+                <span>有空就做：扫出「深化机会」，出一份 HTML 报告，再拷问你挑中的那个。</span>
+              </li>
+            </ul>
+            <h3>词汇层</h3>
+            <ul class="link-list">
+              <li>
+                <code data-cmd="/domain-modeling">/domain-modeling</code>
+                <span>领域语言的纪律：术语、一词多义、ADR、CONTEXT.md。</span>
+              </li>
+              <li>
+                <code data-cmd="/codebase-design">/codebase-design</code>
+                <span>深模块的词汇：module、interface、depth、seam、adapter、leverage、locality。</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <h3>阶段边界：五种选择</h3>
+            <ol class="boundary-list" id="boundary-list"></ol>
+            <p class="panel-note">在边界上做决定。阶段中途？要么继续，要么把剩下的活拆给子代理。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section wrap" id="start" aria-labelledby="start-title">
+        <header class="section-head">
+          <h2 id="start-title">开始使用</h2>
+          <p>技能随包携带，装完即用；仓库级配置只做一次。</p>
+        </header>
+
+        <div class="panels">
+          <article class="panel">
+            <h3>安装</h3>
+            <ol class="step-cmds" id="install-list"></ol>
+          </article>
+          <article class="panel">
+            <h3>每个仓库的第一次</h3>
+            <ol class="step-cmds" id="firstrun-list"></ol>
+            <p class="panel-note">
+              之后从这个仓库里的 <code>/ask-matt</code> 开始。
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <p>
+          数据源：<code>data/skills.js</code>（改它就能改这一页）。
+          技能来自 <a href="https://github.com/mattpocock/skills">mattpocock/skills</a> 的 dsh 适配包
+          <code>dsh-mattpocock-skills</code>，MIT 许可。
+        </p>
+        <p class="footer-meta">零依赖静态页 · 直接打开本文件即可</p>
+      </div>
+    </footer>
+
+    <script src="data/skills.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
