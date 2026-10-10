@@ -49,6 +49,7 @@ gh release create v1.2.0 --generate-notes
 - **tag 就是回滚的锚点**：CD 部署 tag（或 tag 对应的镜像 digest）。部署按分支名 `main` 会让回滚无从下手 —— 你无法说清"上一版"是哪一版。
 - **tag 不可移动、不可删除**：它是发布标识，被改写一次，回滚目标就不可信了。
 - 版本号用语义化版本 `v<major>.<minor>.<patch>`；一个 tag 对应一次上线。
+- 推送 tag 后由 [`cd.yml`](../../.github/workflows/cd.yml) 跑生产部署 job；合进 `test` 会跑测试环境 job；手动触发可以指定版本，这是重新部署（回滚）的入口。**两个 job 目前都是占位**，接入真实目标时替换其中的命令。
 
 ## 回滚
 
