@@ -1,0 +1,30 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+build/
+out/
+coverage/
+*.tsbuildinfo
+
+# 环境变量与密钥 —— 提交一次就是泄漏
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 编辑器 / IDE
+.idea/
+.vscode/
+*.swp
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 临时目录与日志
+.dsh-tmp/
+.scratch/
+*.log
