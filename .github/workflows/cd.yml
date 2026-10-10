@@ -1,0 +1,49 @@
+name: CD
+
+# 三个入口：合进 test → 测试环境；打 tag → 生产；手动 → 指定版本（回滚用）
+on:
+  push:
+    branches: [test]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 要部署的 tag（回滚就填上一个 tag）
+        required: false
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-test:
+    name: deploy-test
+    if: github.ref == 'refs/heads/test'
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v4
+      # 占位：接入真实目标时，把下面的 echo 换成部署脚本调用。
+      - name: 占位部署 —— 测试环境
+        run: |
+          echo "环境: test"
+          echo "版本: ${{ github.sha }}"
+          echo "接入后: ./scripts/deploy.sh test ${{ github.sha }}"
+
+  deploy:
+    name: deploy
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      # 占位：接入真实目标时，把下面的 echo 换成部署脚本调用。
+      - name: 占位部署 —— 生产
+        run: |
+          echo "环境: production"
+          echo "版本: ${{ inputs.version || github.ref_name }}"
+          echo "接入后: ./scripts/deploy.sh production ${{ inputs.version || github.ref_name }}"
