@@ -1,0 +1,27 @@
+name: CI
+
+# 挂到两个位置：PR 进 main（交付门禁）、push 到 test（集成分支自检）
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [test]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 文档完整性检查
+        run: node .github/scripts/check-docs.mjs
