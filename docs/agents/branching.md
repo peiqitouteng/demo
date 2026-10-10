@@ -34,6 +34,42 @@
 - **每个功能一个 PR。** 不把多个功能攒成一个 PR。
 - **`test` 不承载历史。** 需要干净复验时重建它：`git fetch origin && git reset --hard origin/main && git push --force-with-lease`。
 
+## 发布
+
+一次上线 = 在 `main` 的合并提交上打一个**附注 tag**，并留下 Release：
+
+```
+git switch main && git pull
+git tag -a v1.2.0 -m "v1.2.0"
+git push origin v1.2.0
+gh release create v1.2.0 --generate-notes
+```
+
+- **只从 `main` 打**，永远不在功能分支或 `test` 上打。
+- **tag 就是回滚的锚点**：CD 部署 tag（或 tag 对应的镜像 digest）。部署按分支名 `main` 会让回滚无从下手 —— 你无法说清"上一版"是哪一版。
+- **tag 不可移动、不可删除**：它是发布标识，被改写一次，回滚目标就不可信了。
+- 版本号用语义化版本 `v<major>.<minor>.<patch>`；一个 tag 对应一次上线。
+
+## 回滚
+
+| 你要什么 | 怎么做 | 量级 |
+| --- | --- | --- |
+| 线上立刻恢复 | 重新部署**上一个 tag** 的产物，不动 git | 秒级 |
+| 代码真正退回 | revert PR，走门禁 | 分钟级 |
+
+```
+git fetch origin
+git switch -c fix/rollback-<slug> origin/main
+git revert -m 1 <merge_commit_sha>     # 合并提交必须带 -m 1，保留 main 那一侧
+git push -u origin fix/rollback-<slug>
+gh pr create --base main --head fix/rollback-<slug> --title "revert: ..."
+```
+
+- **按功能 revert，不整体后退**：要退多个就直接 `git revert -m 1 <sha> <sha> ...`。整体退到某个点会把别人已上线且正常的功能一起干掉。
+- **不用 reset + force push**：`main` 的 ruleset 会拒绝（`non_fast_forward`），而且会推翻所有人分支的 base、抹掉事故审计。
+- **修好重新上线时，先 revert 那个 revert**，不要重新合并原分支 —— 原提交已在历史里，Git 会认为无事可做。
+- 回滚后把 `main` 合回 `test`，否则被回滚的代码会在下次合并时复活。
+
 ## 验证过的状态 ≠ 发布的状态
 
 A、B 两个分支都合进 `test` 并验证通过后，A、B 可能以另一种顺序、另一种冲突解决方式进入 `main` —— 在 `test` 上验证的那个 commit 组合，未必就是最终发布的组合。两条对策：
